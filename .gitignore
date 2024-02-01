@@ -1,0 +1,31 @@
+# Unity-specific
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+
+# Visual Studio / MonoDevelop
+[Ee]xported[Oo]bj/
+[Ll]ocal[Cc]ache/
+[Ss]aved[Dd]ocuments/
+[Ss]treamingAssets/
+
+# Rider
+.idea/
+
+# User-specific files
+*.suo
+*.user
+*.userprefs
+*.lock
+*.pidb
+.DS_Store
+Thumbs.db
+
+# Unity3D generated meta files
+*.pidb.meta
+
+# Unity3D Generated File On Crash Reports
+sysinfo.txt

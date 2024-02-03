@@ -1,5 +1,8 @@
 {
-  "Levels": [
-    "Level0"
-  ]
+    "Levels": [
+        "Level0"
+    ],
+    "MaxPoints": [
+        3806
+    ]
 }

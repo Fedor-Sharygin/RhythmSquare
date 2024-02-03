@@ -2,6 +2,7 @@ using LevelManager;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour, IGameManager
 {
@@ -26,6 +27,8 @@ public class GameManager : MonoBehaviour, IGameManager
     [SerializeField]
     private TMPro.TextMeshProUGUI tPointsText;
     private int iCurPoints = 0;
+    [SerializeField]
+    private TMPro.TextMeshProUGUI tMaxPointsText;
     [SerializeField]
     private AudioSource auGood;
     [SerializeField]
@@ -62,8 +65,8 @@ public class GameManager : MonoBehaviour, IGameManager
         if (iPoints > 0 && auGood != null)
         {
             auGood.Stop();
-            auGood.time = .106f;
             auGood.Play();
+            auGood.time = .106f;
         }
         if (iPoints < 0 && auBad != null)
         {
@@ -78,9 +81,11 @@ public class GameManager : MonoBehaviour, IGameManager
         srSqureSprite.color = cSquareColor;
     }
 
-    public void SetCurrentLevel(LevelInfo liInformation)
+    private int iCurLevelIdx;
+    public void SetCurrentLevel(int iLevelIdx)
     {
-        mlLevelInfo = liInformation;
+        iCurLevelIdx = iLevelIdx;
+        mlLevelInfo = LevelLoader.giGameInfo.Levels[iLevelIdx];
         StartCoroutine("PassAudio");
     }
 
@@ -112,7 +117,7 @@ public class GameManager : MonoBehaviour, IGameManager
         foreach (TickInfo CurTickInfo in mlLevelInfo.GameBeats)
         {
             GameObject CurTick = Instantiate(pfRhythmTick,
-                new Vector3(CurTickInfo.TimeStamp + .15f, -3.2f),
+                new Vector3(CurTickInfo.TimeStamp, -3.2f),
                 Quaternion.identity,
                 transform.GetChild(1));
             RhythmTick CTInfo = CurTick.GetComponent<RhythmTick>();
@@ -122,12 +127,16 @@ public class GameManager : MonoBehaviour, IGameManager
 
             //Opposite Tick
             GameObject OppTick = Instantiate(pfRhythmTick,
-                new Vector3(-CurTickInfo.TimeStamp - .15f, -3.2f),
+                new Vector3(-CurTickInfo.TimeStamp, -3.2f),
                 Quaternion.identity,
                 transform.GetChild(1));
             RhythmTick OTInfo = OppTick.GetComponent<RhythmTick>();
             lTickList.Add(OTInfo);
             OTInfo.cSquareColor = CurTickInfo.SquareColor;
+        }
+        if (tMaxPointsText != null)
+        {
+            tMaxPointsText.text = LevelLoader.giGameInfo.MaxPoints[iCurLevelIdx].ToString();
         }
     #endif
     }
@@ -152,5 +161,33 @@ public class GameManager : MonoBehaviour, IGameManager
     public AudioSource GetAudioSource()
     {
         return auSource;
+    }
+
+    [SerializeField]
+    private float fExitDelay = 5f;
+    private void Update()
+    {
+        if (auSource.isPlaying)
+        {
+            return;
+        }
+
+        fExitDelay -= Time.deltaTime;
+        if (fExitDelay > 0f)
+        {
+            if (tMaxPointsText != null)
+            {
+                int CurPoints = int.Parse(tMaxPointsText.text);
+                if (CurPoints < iCurPoints)
+                {
+                    CurPoints += 5;
+                    tMaxPointsText.text = Mathf.Min(CurPoints, iCurPoints).ToString();
+                }
+            }
+            return;
+        }
+
+        LevelLoader.giGameInfo.SetMaxPointsForLevel(iCurLevelIdx, int.Parse(tMaxPointsText.text));
+        SceneManager.LoadSceneAsync(0);
     }
 }

@@ -10,7 +10,8 @@ namespace LevelManager
     public static class LevelLoader
     {
         public static GameInfo giGameInfo;
-        private static string sFileName = "LevelInfo.json";
+        private static string DirectoryPath = DirectoryPath = Path.Combine(Application.dataPath, "level_info");
+        private static string LevelInfoPath = Path.Combine(DirectoryPath, "LevelInfo.json");
 
         private static bool bSetupComplete = false;
         private static int iLevelChosen = -1;
@@ -20,9 +21,6 @@ namespace LevelManager
             {
                 return;
             }
-            string DirectoryPath = Application.dataPath.Replace("/", "\\\\");
-            DirectoryPath = Path.Combine(DirectoryPath, "level_info");
-            string LevelInfoPath = Path.Combine(DirectoryPath, sFileName);
             bSetupComplete = File.Exists(LevelInfoPath);
             if (!bSetupComplete)
             {
@@ -46,26 +44,27 @@ namespace LevelManager
             }
             LoadLevels();
             SceneManager.sceneLoaded += PassInfo;
+            Application.quitting += SaveMaxPoints;
         }
 
         [Serializable]
         private struct LevelFileNames
         {
             public string[] Levels;
+            public int[] MaxPoints;
         }
         public static void LoadLevels()
         {
-            string DirectoryPath = Path.Combine(Application.dataPath, "level_info");
-            string LevelInfoPath = Path.Combine(DirectoryPath, sFileName);
             string LevelInfoString = File.ReadAllText(LevelInfoPath);
 
             try
             {
                 giGameInfo = new GameInfo();
                 LevelFileNames LevelNames = JsonUtility.FromJson<LevelFileNames>(LevelInfoString);
+                int LvlIdx = 0;
                 foreach (string LName in LevelNames.Levels)
                 {
-                    giGameInfo.ParseLevel(LName);
+                    giGameInfo.ParseLevel(LName, LevelNames.MaxPoints[LvlIdx++]);
                 }
             }
             catch (Exception ex)
@@ -100,15 +99,27 @@ namespace LevelManager
             }
             if (iLevelChosen != 1000)
             {
-                LevelInfo CurLevelInfo = GetMusicInfo(iLevelChosen);
-                LevelEditor.SetCurFileLevel(giGameInfo.GetLevelName(iLevelChosen), false, CurLevelInfo, GM.GetAudioSource());
-                GM.SetCurrentLevel(CurLevelInfo);
+                #if UNITY_STANDALONE || UNITY_EDITOR
+                LevelEditor.SetCurFileLevel(giGameInfo.GetLevelName(iLevelChosen),
+                    false, GetMusicInfo(iLevelChosen), GM.GetAudioSource());
+                #endif
+                GM.SetCurrentLevel(iLevelChosen);
             }
         }
 
         public static LevelInfo GetMusicInfo(int iIdx)
         {
             return giGameInfo.Levels[iIdx];
+        }
+
+        private static void SaveMaxPoints()
+        {
+            LevelFileNames LevelNames = new LevelFileNames();
+            LevelNames.Levels = giGameInfo.saLevelNames.ToArray();
+            LevelNames.MaxPoints = giGameInfo.MaxPoints.ToArray();
+
+            string JsonDesc = JsonUtility.ToJson(LevelNames, true);
+            File.WriteAllText(LevelInfoPath, JsonDesc);
         }
     }
 }

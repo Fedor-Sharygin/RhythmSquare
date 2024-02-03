@@ -5,10 +5,12 @@ using UnityEngine;
 public class RhythmTarget : MonoBehaviour
 {
     private List<GameObject> lgoRhythmTicks;
+    private Animator aAnimator;
 
     private void Awake()
     {
         lgoRhythmTicks = new List<GameObject>();
+        aAnimator = GetComponent<Animator>();
     }
 
     private void OnTriggerEnter2D(Collider2D cCollision)
@@ -60,6 +62,8 @@ public class RhythmTarget : MonoBehaviour
         {
             return;
         }
+
+        aAnimator.SetTrigger("Bounce");
 
         lgoRhythmTicks[0].GetComponent<RhythmTick>()?.DisableCollision();
         lgoRhythmTicks[1].GetComponent<RhythmTick>()?.DisableCollision();

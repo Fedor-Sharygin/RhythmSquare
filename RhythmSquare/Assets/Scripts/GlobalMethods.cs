@@ -31,8 +31,7 @@ namespace GlobalNamespace
         [Obsolete]
         public static IEnumerator<AudioClip> GetAudioClip(string sMusicName)
         {
-            string FilePath = Application.dataPath.Replace("/", "\\\\");
-            FilePath = Path.Combine(FilePath, "level_info", sMusicName);
+            string FilePath = Path.Combine(Application.dataPath, "level_info", sMusicName);
             WWW w = new WWW($"file://{FilePath}");
             yield return w.GetAudioClip(false, false);
         }

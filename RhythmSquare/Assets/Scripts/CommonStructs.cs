@@ -26,16 +26,16 @@ namespace LevelManager
         public TickInfo[] GameBeats;
         public TickInfo[] IntroBeats;
     }
-    [Serializable]
     public class GameInfo
     {
         public GameInfo()
         {
             saLevelNames = new List<string>();
             Levels = new List<LevelInfo>();
+            MaxPoints = new List<int>();
         }
 
-        public void ParseLevel(string sLevelFileName)
+        public void ParseLevel(string sLevelFileName, int iMaxPoints)
         {
             if (saLevelNames.Contains(sLevelFileName))
             {
@@ -47,7 +47,10 @@ namespace LevelManager
             string DirectoryPath = Path.Combine(Application.dataPath, "level_info");
             string LevelInfoPath = Path.Combine(DirectoryPath, sLevelFileName + ".json");
             string LevelInfoString = File.ReadAllText(LevelInfoPath);
-            Levels.Add(JsonUtility.FromJson<LevelInfo>(LevelInfoString));
+            LevelInfo NLevelInfo = JsonUtility.FromJson<LevelInfo>(LevelInfoString);
+            Levels.Add(NLevelInfo);
+
+            MaxPoints.Add(iMaxPoints);
         }
 
         public string GetLevelName(int iCurIdx)
@@ -59,7 +62,13 @@ namespace LevelManager
             return saLevelNames[iCurIdx];
         }
 
+        public void SetMaxPointsForLevel(int iLvlIdx, int iMaxPts)
+        {
+            MaxPoints[iLvlIdx] = iMaxPts;
+        }
+
         public List<LevelInfo> Levels { private set; get; }
-        private List<string> saLevelNames;
+        public List<string> saLevelNames { private set; get; }
+        public List<int> MaxPoints;
     }
 }

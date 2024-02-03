@@ -5,7 +5,7 @@ using UnityEngine;
 interface IGameManager
 {
     public void GetPoints(int iPoints, Color cSquareColor);
-    public void SetCurrentLevel(LevelManager.LevelInfo liInformation);
+    public void SetCurrentLevel(int iLevelIdx);
     public void ParseInformation();
     public IEnumerator PassAudio();
     public AudioSource GetAudioSource();

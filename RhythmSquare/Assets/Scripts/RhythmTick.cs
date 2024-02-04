@@ -7,6 +7,17 @@ public class RhythmTick : MonoBehaviour
 {
     public static event Action<int, Color> GrantPointsEvent = delegate { };
 
+    private Transform tSpriteTransform;
+    private Vector3 BaseScale = new Vector3(.5f, .5f);
+    private void Awake()
+    {
+        tSpriteTransform = transform.GetChild(0);
+        if (tSpriteTransform != null)
+        {
+            tSpriteTransform.localScale = BaseScale;
+        }
+    }
+
     private bool bDeduct = false;
     public Color cSquareColor { set; private get; } = Color.white;
     private bool bCurrDestroyed = false;
@@ -37,6 +48,14 @@ public class RhythmTick : MonoBehaviour
             return;
         }
         transform.position += new Vector3(fSpeed * Time.deltaTime, 0f);
+
+        if (!tSpriteTransform)
+        {
+            return;
+        }
+        float DistToCenter = (Mathf.Abs(transform.position.x) + 1) / 3f * Mathf.PI;
+        float ScaleEffect = Mathf.Sin(DistToCenter) + 1;
+        tSpriteTransform.localScale = BaseScale + 1.4f * ScaleEffect * Vector3.one;
     }
 
     private void OnDestroy()

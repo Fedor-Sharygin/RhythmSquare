@@ -8,6 +8,7 @@ TagManager:
   - RhythmTick
   - GameManager
   - RecordSymbol
+  - RhythmLine
   layers:
   - Default
   - TransparentFX

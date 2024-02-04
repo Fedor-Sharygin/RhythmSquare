@@ -60,6 +60,7 @@ public class RhythmTarget : MonoBehaviour
     {
         if (lgoRhythmTicks.Count <= 1)
         {
+            GameObject.FindGameObjectWithTag("GameManager")?.GetComponent<GameManager>()?.GetPoints(-10, Color.grey);
             return;
         }
 

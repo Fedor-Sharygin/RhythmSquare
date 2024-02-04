@@ -114,20 +114,21 @@ public class GameManager : MonoBehaviour, IGameManager
         }
     #endif
     #if true
+        float TickSpeed = pfRhythmTick.GetComponent<RhythmTick>().fSpeed;
         foreach (TickInfo CurTickInfo in mlLevelInfo.GameBeats)
         {
             GameObject CurTick = Instantiate(pfRhythmTick,
-                new Vector3(CurTickInfo.TimeStamp, -3.2f),
+                new Vector3(CurTickInfo.TimeStamp * TickSpeed, -3.2f),
                 Quaternion.identity,
                 transform.GetChild(1));
             RhythmTick CTInfo = CurTick.GetComponent<RhythmTick>();
             lTickList.Add(CTInfo);
-            CTInfo.fSpeed = -1f;
+            CTInfo.fSpeed = -TickSpeed;
             CTInfo.cSquareColor = CurTickInfo.SquareColor;
 
             //Opposite Tick
             GameObject OppTick = Instantiate(pfRhythmTick,
-                new Vector3(-CurTickInfo.TimeStamp, -3.2f),
+                new Vector3(-CurTickInfo.TimeStamp * TickSpeed, -3.2f),
                 Quaternion.identity,
                 transform.GetChild(1));
             RhythmTick OTInfo = OppTick.GetComponent<RhythmTick>();

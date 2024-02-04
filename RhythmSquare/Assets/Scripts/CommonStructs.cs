@@ -23,6 +23,7 @@ namespace LevelManager
     public struct LevelInfo
     {
         public string MusicName;
+        public string LevelName;
         public TickInfo[] GameBeats;
         public TickInfo[] IntroBeats;
     }

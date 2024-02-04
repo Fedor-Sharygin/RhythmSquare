@@ -17,9 +17,6 @@ public class MenuAnimationLoop : MonoBehaviour
             return;
         }
 
-        StartCoroutine("StartAudio");
-
-
         GameObject RecCirc = GameObject.FindGameObjectWithTag("RecordSymbol");
         if (RecCirc != null)
         {
@@ -32,14 +29,19 @@ public class MenuAnimationLoop : MonoBehaviour
     }
 
     private LevelManager.LevelInfo CurLevelInfo;
-    private IEnumerator StartAudio()
+    private int iClipIdx;
+    public void StartAudio(int iAudioIdx)
     {
-        int AudioClipIdx = Random.Range(0, LevelManager.LevelLoader.giGameInfo.Levels.Count);
-        CurLevelInfo = LevelManager.LevelLoader.GetMusicInfo(AudioClipIdx);
-        MainMenu.iDropdownIdx = AudioClipIdx;
+        iClipIdx = iAudioIdx;
+        StartCoroutine("ChangeAudio");
+    }
+
+    public IEnumerator ChangeAudio()
+    {
+        CurLevelInfo = LevelManager.LevelLoader.GetMusicInfo(iClipIdx);
 
         #if UNITY_STANDALONE  || UNITY_EDITOR
-        LevelManager.LevelEditor.SetCurFileLevel(LevelManager.LevelLoader.giGameInfo.GetLevelName(AudioClipIdx),
+        LevelManager.LevelEditor.SetCurFileLevel(LevelManager.LevelLoader.giGameInfo.GetLevelName(iClipIdx),
             true, CurLevelInfo, auSource);
         #endif
 
@@ -48,6 +50,8 @@ public class MenuAnimationLoop : MonoBehaviour
             {
                 auSource.clip = acAudioClip;
                 auSource.loop = true;
+                iIntroBeatIdx = 0;
+                bReceivedAudio = true;
                 auSource.Play();
             }
         );
@@ -58,6 +62,7 @@ public class MenuAnimationLoop : MonoBehaviour
     [SerializeField]
     private SpriteRenderer srSquareSprite;
     private int iIntroBeatIdx;
+    private bool bReceivedAudio = false;
     private void Update()
     {
         #if UNITY_STANDALONE || UNITY_EDITOR
@@ -70,6 +75,10 @@ public class MenuAnimationLoop : MonoBehaviour
         {
         #endif
 
+        if (!bReceivedAudio)
+        {
+            return;
+        }
 
         if (Mathf.Abs(auSource.time - CurLevelInfo.IntroBeats[iIntroBeatIdx].TimeStamp) >= .05f)
         {

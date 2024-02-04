@@ -8,6 +8,8 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField]
     private TMP_Dropdown tdLevelSelect;
+    [SerializeField]
+    private MenuAnimationLoop malRef;
     public void Awake()
     {
         tdLevelSelect.ClearOptions();
@@ -17,20 +19,15 @@ public class MainMenu : MonoBehaviour
             NewOptions.Add(Level.LevelName);
         }
         tdLevelSelect.AddOptions(NewOptions);
+
+        int ClipIdx = Random.Range(0, LevelManager.LevelLoader.giGameInfo.Levels.Count);
+        malRef.StartAudio(ClipIdx);
+        tdLevelSelect.value = ClipIdx;
     }
 
-
-    public static int iDropdownIdx { set; private get; }
     public void SelectLevel()
     {
-        iDropdownIdx = tdLevelSelect.value;
-    }
-    private void Update()
-    {
-        if (tdLevelSelect.value != iDropdownIdx)
-        {
-            tdLevelSelect.value = iDropdownIdx;
-        }
+        malRef.StartAudio(tdLevelSelect.value);
     }
 
     public void Quit()

@@ -36,6 +36,7 @@ public class MenuAnimationLoop : MonoBehaviour
     {
         int AudioClipIdx = Random.Range(0, LevelManager.LevelLoader.giGameInfo.Levels.Count);
         CurLevelInfo = LevelManager.LevelLoader.GetMusicInfo(AudioClipIdx);
+        MainMenu.iDropdownIdx = AudioClipIdx;
 
         #if UNITY_STANDALONE  || UNITY_EDITOR
         LevelManager.LevelEditor.SetCurFileLevel(LevelManager.LevelLoader.giGameInfo.GetLevelName(AudioClipIdx),
@@ -75,7 +76,10 @@ public class MenuAnimationLoop : MonoBehaviour
             return;
         }
 
-        srSquareSprite.color = CurLevelInfo.IntroBeats[iIntroBeatIdx].SquareColor;
+        //srSquareSprite.color = CurLevelInfo.IntroBeats[iIntroBeatIdx].SquareColor;
+        srSquareSprite.color = new Color(Random.Range(.2f, .9f),
+                                         Random.Range(.2f, .9f),
+                                         Random.Range(.2f, .9f));
         aSquareAnim.SetTrigger("Bounce");
         iIntroBeatIdx = (iIntroBeatIdx + 1) % CurLevelInfo.IntroBeats.Length;
 

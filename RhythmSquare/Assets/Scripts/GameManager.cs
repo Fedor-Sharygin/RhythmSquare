@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour, IGameManager
         RhythmTick.GrantPointsEvent -= GetPoints;
     }
 
-    public void GetPoints(int iPoints, Color cSquareColor)
+    public void GetPoints(int iPoints)
     {
         iCurPoints += iPoints;
         if (tPointsText != null)
@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour, IGameManager
         //srSqureSprite.color = new Color(Random.Range(.2f, .9f),
         //                                Random.Range(.2f, .9f),
         //                                Random.Range(.2f, .9f));
-        srSqureSprite.color = cSquareColor;
+        srSqureSprite.color = iPoints < 0 ? Color.grey : GlobalNamespace.GlobalMethods.cCurFrameColor;
     }
 
     private int iCurLevelIdx;

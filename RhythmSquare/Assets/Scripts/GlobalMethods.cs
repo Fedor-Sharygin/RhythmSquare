@@ -28,6 +28,14 @@ namespace GlobalNamespace
             }
         }
 
+        public static Color cCurFrameColor { get; private set; }
+        public static void SetNewColor()
+        {
+            cCurFrameColor = new Color(UnityEngine.Random.Range(.2f, .9f),
+                                       UnityEngine.Random.Range(.2f, .9f),
+                                       UnityEngine.Random.Range(.2f, .9f));
+        }
+
         [Obsolete]
         public static IEnumerator<AudioClip> GetAudioClip(string sMusicName)
         {

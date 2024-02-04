@@ -6,11 +6,15 @@ public class RhythmTarget : MonoBehaviour
 {
     private List<GameObject> lgoRhythmTicks;
     private Animator aAnimator;
-
+    [SerializeField]
+    private ParticleSystemRenderer psColorRenderer;
+    [SerializeField]
+    private ParticleSystem psColorEmitter;
     private void Awake()
     {
         lgoRhythmTicks = new List<GameObject>();
         aAnimator = GetComponent<Animator>();
+        psColorRenderer.renderingLayerMask = 20;
     }
 
     private void OnTriggerEnter2D(Collider2D cCollision)
@@ -56,18 +60,34 @@ public class RhythmTarget : MonoBehaviour
         #endif
     }
 
+
+    [SerializeField]
+    private List<SpriteRenderer> lSpriteDependencies;
     private void PressTick()
     {
         if (lgoRhythmTicks.Count <= 1)
         {
-            GameObject.FindGameObjectWithTag("GameManager")?.GetComponent<GameManager>()?.GetPoints(-10, Color.grey);
+            GameObject.FindGameObjectWithTag("GameManager")?.GetComponent<GameManager>()?.GetPoints(-10);
             return;
         }
 
         aAnimator.SetTrigger("Bounce");
+        GlobalNamespace.GlobalMethods.SetNewColor();
 
-        lgoRhythmTicks[0].GetComponent<RhythmTick>()?.DisableCollision();
-        lgoRhythmTicks[1].GetComponent<RhythmTick>()?.DisableCollision();
+        psColorEmitter.startColor = GlobalNamespace.GlobalMethods.cCurFrameColor;
+        if (psColorEmitter.isPlaying)
+        {
+            psColorEmitter.Stop();
+        }
+        psColorEmitter.Play();
+
+        foreach (SpriteRenderer srRender in lSpriteDependencies)
+        {
+            srRender.color = GlobalNamespace.GlobalMethods.cCurFrameColor;
+        }
+
+        //lgoRhythmTicks[0].GetComponent<RhythmTick>()?.DisableCollision();
+        //lgoRhythmTicks[1].GetComponent<RhythmTick>()?.DisableCollision();
 
         Destroy(lgoRhythmTicks[0]);
         Destroy(lgoRhythmTicks[1]);

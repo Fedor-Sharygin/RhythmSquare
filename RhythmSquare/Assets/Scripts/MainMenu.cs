@@ -19,19 +19,28 @@ public class MainMenu : MonoBehaviour
         tdLevelSelect.AddOptions(NewOptions);
     }
 
-    public static void SelectLevel()
-    {
 
+    public static int iDropdownIdx { set; private get; }
+    public void SelectLevel()
+    {
+        iDropdownIdx = tdLevelSelect.value;
+    }
+    private void Update()
+    {
+        if (tdLevelSelect.value != iDropdownIdx)
+        {
+            tdLevelSelect.value = iDropdownIdx;
+        }
     }
 
-    public static void Quit()
+    public void Quit()
     {
         Application.Quit();
     }
 
-    public static void Play()
+    public void Play()
     {
-        int RIdx = Random.Range(0, LevelManager.LevelLoader.giGameInfo.Levels.Count);
-        LevelManager.LevelLoader.LoadLevel(RIdx);
+        //int RIdx = Random.Range(0, LevelManager.LevelLoader.giGameInfo.Levels.Count);
+        LevelLoader.LoadLevel(tdLevelSelect.value);
     }
 }

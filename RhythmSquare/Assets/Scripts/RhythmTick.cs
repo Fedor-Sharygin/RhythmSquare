@@ -5,7 +5,7 @@ using System;
 
 public class RhythmTick : MonoBehaviour
 {
-    public static event Action<int, Color> GrantPointsEvent = delegate { };
+    public static event Action<int> GrantPointsEvent = delegate { };
 
     private Transform tSpriteTransform;
     private Vector3 BaseScale = new Vector3(.5f, .5f);
@@ -20,22 +20,15 @@ public class RhythmTick : MonoBehaviour
 
     private bool bDeduct = false;
     public Color cSquareColor { set; private get; } = Color.white;
-    private bool bCurrDestroyed = false;
-    private void OnCollisionExit2D(Collision2D cOther)
+    private void Update()
     {
-        if (bCurrDestroyed)
-        {
-            return;
-        }
-        if (cOther.gameObject.tag == "RhythmTick")
+        if (transform.position.x * Mathf.Sign(fSpeed) > .1f)
         {
             bDeduct = true;
             Destroy(gameObject);
+            return;
         }
-    }
 
-    private void Update()
-    {
         Move();
     }
 
@@ -55,22 +48,16 @@ public class RhythmTick : MonoBehaviour
         }
         float DistToCenter = (Mathf.Abs(transform.position.x) + 1) / 3f * Mathf.PI;
         float ScaleEffect = Mathf.Sin(DistToCenter) + 1;
-        tSpriteTransform.localScale = BaseScale + 1.4f * ScaleEffect * Vector3.one;
+        tSpriteTransform.localScale = BaseScale + 2f * ScaleEffect * Vector3.one;
     }
 
     private void OnDestroy()
     {
-        int Points = bDeduct ? -5 : 10 - 2 * Mathf.FloorToInt(Mathf.Abs(transform.position.x) / .05f);
-        Color SquareColor = bDeduct ? Color.grey : cSquareColor;
-        GrantPointsEvent(Points, SquareColor);
+        int Points = bDeduct ? -5 : 10 - 2 * Mathf.FloorToInt(Mathf.Abs(transform.position.x) / .1f);
+        GrantPointsEvent(Points);
         if (bDeduct)
         {
             GameObject.FindGameObjectWithTag("RhythmTarget")?.GetComponent<RhythmTarget>()?.RemoveTickFail();
         }
-    }
-
-    public void DisableCollision()
-    {
-        bCurrDestroyed = true;
     }
 }

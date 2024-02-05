@@ -189,6 +189,6 @@ public class GameManager : MonoBehaviour, IGameManager
         }
 
         LevelLoader.giGameInfo.SetMaxPointsForLevel(iCurLevelIdx, int.Parse(tMaxPointsText.text));
-        SceneManager.LoadSceneAsync(0);
+        SceneManager.LoadSceneAsync("MainMenu");
     }
 }

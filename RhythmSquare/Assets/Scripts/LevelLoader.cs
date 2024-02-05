@@ -76,7 +76,7 @@ namespace LevelManager
         public static void LoadLevel(int iIdx)
         {
             iLevelChosen = iIdx;
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene("GameScene");
         }
 
         public static void PassInfo(Scene sScene, LoadSceneMode _lsmMode)

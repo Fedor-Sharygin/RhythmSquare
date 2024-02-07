@@ -66,7 +66,7 @@ namespace LevelManager
                 liLevel.GameBeats = NTickList.ToArray();
             }
 
-            string DirectoryPath = Path.Combine(Application.dataPath, "level_info");
+            string DirectoryPath = Path.Combine(Application.streamingAssetsPath, "level_info");
             string FilePath = Path.Combine(DirectoryPath, sCurLevelFile + ".json");
             string JsonDesc = JsonUtility.ToJson(liLevel, true);
             File.WriteAllText(FilePath, JsonDesc);

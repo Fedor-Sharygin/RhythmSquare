@@ -11,8 +11,15 @@ namespace GlobalNamespace
     {
         public static IEnumerator GetAudioClip(string sMusicName, Action<AudioClip> aCallback)
         {
-            string FilePath = Path.Combine(Application.dataPath, "level_info", sMusicName);
-            UnityWebRequest UWR = UnityWebRequestMultimedia.GetAudioClip($"file://{FilePath}", AudioType.WAV);
+            string FilePath = Path.Combine(Application.streamingAssetsPath, "level_info", sMusicName);
+            
+            #if UNITY_STANDALONE || UNITY_EDITOR
+            
+            FilePath = $"file://{FilePath}";
+            
+            #endif
+            
+            UnityWebRequest UWR = UnityWebRequestMultimedia.GetAudioClip(FilePath, AudioType.WAV);
             yield return UWR.SendWebRequest();
 
             if (UWR.result == UnityWebRequest.Result.ConnectionError
@@ -39,7 +46,7 @@ namespace GlobalNamespace
         [Obsolete]
         public static IEnumerator<AudioClip> GetAudioClip(string sMusicName)
         {
-            string FilePath = Path.Combine(Application.dataPath, "level_info", sMusicName);
+            string FilePath = Path.Combine(Application.streamingAssetsPath, "level_info", sMusicName);
             WWW w = new WWW($"file://{FilePath}");
             yield return w.GetAudioClip(false, false);
         }

@@ -30,27 +30,37 @@ public class RhythmTarget : MonoBehaviour
     {
         #if UNITY_ANDROID || UNITY_IOS
         
-        if (Input.touchCount - PrevTouchCount > 1)
+        if (Input.touchCount - PrevTouchCount > 0)
         {
             StartCoroutine("PressTick");
         }
         PrevTouchCount = Input.touchCount;
 
         #else
+
+        #if UNITY_STANDALONE || UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.F9))
         {
             LevelManager.LevelEditor.FlipEditState();
         }
+        #endif
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            #if UNITY_STANDALONE || UNITY_EDITOR
             if (!LevelManager.LevelEditor.bLevelEditingState)
             {
-                StartCoroutine("PressTick");
+            #endif
+
+            StartCoroutine("PressTick");
+
+            #if UNITY_STANDALONE || UNITY_EDITOR
             }
             else
             {
                 LevelManager.LevelEditor.AddBeat();
             }
+            #endif
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {

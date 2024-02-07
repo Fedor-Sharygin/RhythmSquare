@@ -4,13 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System;
+using UnityEngine.Networking;
 
 namespace LevelManager
 {
     public static class LevelLoader
     {
         public static GameInfo giGameInfo;
-        private static string DirectoryPath = DirectoryPath = Path.Combine(Application.dataPath, "level_info");
+        private static string DirectoryPath = DirectoryPath = Path.Combine(Application.streamingAssetsPath, "level_info");
         private static string LevelInfoPath = Path.Combine(DirectoryPath, "LevelInfo.json");
 
         private static bool bSetupComplete = false;
@@ -21,6 +22,9 @@ namespace LevelManager
             {
                 return;
             }
+
+            #if UNITY_STANDALONE || UNITY_EDITOR
+            
             bSetupComplete = File.Exists(LevelInfoPath);
             if (!bSetupComplete)
             {
@@ -42,6 +46,13 @@ namespace LevelManager
                     }
                 }
             }
+            
+            #else
+            
+            bSetupComplete = true;
+            
+            #endif
+
             LoadLevels();
             SceneManager.sceneLoaded += PassInfo;
             Application.quitting += SaveMaxPoints;
@@ -55,7 +66,21 @@ namespace LevelManager
         }
         public static void LoadLevels()
         {
-            string LevelInfoString = File.ReadAllText(LevelInfoPath);
+            string LevelInfoString;
+            
+            #if UNITY_ANDROID
+
+            //Debug.Log(LevelInfoPath);
+            UnityWebRequest www = UnityWebRequest.Get(LevelInfoPath);
+            www.SendWebRequest();
+            while (!www.isDone);
+            LevelInfoString = www.downloadHandler.text;
+            
+            #elif UNITY_STANDALONE || UNITY_EDITOR
+            
+            LevelInfoString = File.ReadAllText(LevelInfoPath);
+            
+            #endif
 
             try
             {

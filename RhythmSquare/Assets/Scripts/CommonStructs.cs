@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace LevelManager
 {
@@ -45,9 +46,23 @@ namespace LevelManager
 
             saLevelNames.Add(sLevelFileName);
 
-            string DirectoryPath = Path.Combine(Application.dataPath, "level_info");
+            string DirectoryPath = Path.Combine(Application.streamingAssetsPath, "level_info");
             string LevelInfoPath = Path.Combine(DirectoryPath, sLevelFileName + ".json");
-            string LevelInfoString = File.ReadAllText(LevelInfoPath);
+            string LevelInfoString;
+            
+            #if UNITY_STANDALONE || UNITY_EDITOR
+            
+            LevelInfoString = File.ReadAllText(LevelInfoPath);
+            
+            #else
+            
+            UnityWebRequest www = UnityWebRequest.Get(LevelInfoPath);
+            www.SendWebRequest();
+            while (!www.isDone);
+            LevelInfoString = www.downloadHandler.text;
+            
+            #endif
+
             LevelInfo NLevelInfo = JsonUtility.FromJson<LevelInfo>(LevelInfoString);
             Levels.Add(NLevelInfo);
 

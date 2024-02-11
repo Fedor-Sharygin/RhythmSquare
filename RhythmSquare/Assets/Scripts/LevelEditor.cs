@@ -31,11 +31,11 @@ namespace LevelManager
         }
 
         private static string sCurLevelFile;
-        private static LevelManager.LevelInfo liLevel;
+        private static LevelInfo liLevel;
         private static AudioSource auSource;
         private static bool bIntroRecording;
         private static List<float> lfTimeStamps = new List<float>();
-        public static void SetCurFileLevel(string sFileLevel, bool bRecordState, LevelManager.LevelInfo liNLevel, AudioSource auNSource)
+        public static void SetCurFileLevel(string sFileLevel, bool bRecordState, LevelInfo liNLevel, AudioSource auNSource)
         {
             sCurLevelFile = sFileLevel;
             bIntroRecording = bRecordState;
@@ -51,10 +51,10 @@ namespace LevelManager
 
         private static void SaveToFile()
         {
-            List<LevelManager.TickInfo> NTickList = new List<LevelManager.TickInfo>();
+            List<TickInfo> NTickList = new List<TickInfo>();
             foreach (float TimeStamp in lfTimeStamps)
             {
-                NTickList.Add(new LevelManager.TickInfo(TimeStamp));
+                NTickList.Add(new TickInfo(TimeStamp));
             }
 
             if (bIntroRecording)
@@ -66,8 +66,7 @@ namespace LevelManager
                 liLevel.GameBeats = NTickList.ToArray();
             }
 
-            string DirectoryPath = Path.Combine(Application.streamingAssetsPath, "level_info");
-            string FilePath = Path.Combine(DirectoryPath, sCurLevelFile + ".json");
+            string FilePath = Path.Combine(GlobalNamespace.GlobalMethods.PersistentFolder, sCurLevelFile + ".json");
             string JsonDesc = JsonUtility.ToJson(liLevel, true);
             File.WriteAllText(FilePath, JsonDesc);
         }

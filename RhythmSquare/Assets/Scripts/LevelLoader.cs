@@ -11,51 +11,41 @@ namespace LevelManager
     public static class LevelLoader
     {
         public static GameInfo giGameInfo;
-        private static string DirectoryPath = DirectoryPath = Path.Combine(Application.streamingAssetsPath, "level_info");
-        private static string LevelInfoPath = Path.Combine(DirectoryPath, "LevelInfo.json");
+        private static string LevelInfoPath = Path.Combine(GlobalNamespace.GlobalMethods.PersistentFolder, "LevelInfo.json");
+        private static string StrLvlInfoPath = Path.Combine(GlobalNamespace.GlobalMethods.ReadOnlyFolder, "LevelInfo.json");
 
+        private static void CreatePDPFile(string LevelInfo)
+        {
+            if (Directory.CreateDirectory(GlobalNamespace.GlobalMethods.PersistentFolder) == null)
+            {
+                Debug.LogError($"{GlobalNamespace.GlobalMethods.PersistentFolder} directory failed at creation");
+            }
+            FileStream _DummyStream = File.Create(LevelInfoPath, 4096, FileOptions.WriteThrough | FileOptions.Asynchronous);
+            if (_DummyStream == null)
+            {
+                Debug.LogError($"File {LevelInfoPath} creation failed!");
+            }
+            else
+            {
+                _DummyStream.Close();
+            }
+            File.WriteAllText(LevelInfoPath, LevelInfo);
+        }
+
+        private static bool bCurInSetupMode = false;
         private static bool bSetupComplete = false;
         private static int iLevelChosen = -1;
         public static void SetupLevelManager()
         {
-            if (bSetupComplete)
+            if (bCurInSetupMode || bSetupComplete)
             {
                 return;
             }
-
-            #if UNITY_STANDALONE || UNITY_EDITOR
-            
-            bSetupComplete = File.Exists(LevelInfoPath);
-            if (!bSetupComplete)
-            {
-                if (Directory.CreateDirectory(DirectoryPath) == null)
-                {
-                    Debug.LogError($"{DirectoryPath} directory failed at creation");
-                }
-                using (FileStream _DummyStream = File.Create(LevelInfoPath, 4096, FileOptions.WriteThrough))
-                {
-                    if (_DummyStream == null)
-                    {
-                        Debug.LogError($"{LevelInfoPath} file failed at creation");
-                    }
-                    else
-                    {
-                        Debug.Log($"File {LevelInfoPath} created successfully!");
-                        bSetupComplete = true;
-                        _DummyStream.Close();
-                    }
-                }
-            }
-            
-            #else
-            
-            bSetupComplete = true;
-            
-            #endif
-
+            bCurInSetupMode = true;
             LoadLevels();
             SceneManager.sceneLoaded += PassInfo;
             Application.quitting += SaveMaxPoints;
+            bCurInSetupMode = false;
         }
 
         [Serializable]
@@ -67,20 +57,38 @@ namespace LevelManager
         public static void LoadLevels()
         {
             string LevelInfoString;
+            string sCurLevelPath = LevelInfoPath;
+            bool bNoFileAvailable;
+            if (bNoFileAvailable = !File.Exists(sCurLevelPath))
+            {
+                sCurLevelPath = StrLvlInfoPath;
+            }
             
             #if UNITY_ANDROID
 
-            //Debug.Log(LevelInfoPath);
-            UnityWebRequest www = UnityWebRequest.Get(LevelInfoPath);
+            UnityWebRequest www = UnityWebRequest.Get(sCurLevelPath);
             www.SendWebRequest();
             while (!www.isDone);
-            LevelInfoString = www.downloadHandler.text;
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                LevelInfoString = www.downloadHandler.text;
+            }
+            else
+            {
+                Debug.LogWarning($"Error while parsing [{sCurLevelPath}] file: [{www.error}]");
+                LevelInfoString = File.ReadAllText(sCurLevelPath);
+            }
             
             #elif UNITY_STANDALONE || UNITY_EDITOR
             
-            LevelInfoString = File.ReadAllText(LevelInfoPath);
+            LevelInfoString = File.ReadAllText(sCurLevelPath);
             
             #endif
+            
+            if (bNoFileAvailable)
+            {
+                CreatePDPFile(LevelInfoString);
+            }
 
             try
             {
@@ -96,6 +104,8 @@ namespace LevelManager
             {
                 Debug.LogError($"Error during deserialization: {ex.Message}");
             }
+
+            bSetupComplete = true;
         }
 
         public static void LoadLevel(int iIdx)
@@ -108,6 +118,10 @@ namespace LevelManager
         {
             if (sScene.name != "GameScene")
             {
+                if (bSetupComplete)
+                {
+                    SaveMaxPoints();
+                }
                 return;
             }
 

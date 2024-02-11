@@ -11,7 +11,7 @@ namespace GlobalNamespace
     {
         public static IEnumerator GetAudioClip(string sMusicName, Action<AudioClip> aCallback)
         {
-            string FilePath = Path.Combine(Application.streamingAssetsPath, "level_info", sMusicName);
+            string FilePath = Path.Combine(ReadOnlyFolder, sMusicName);
             
             #if UNITY_STANDALONE || UNITY_EDITOR
             
@@ -43,12 +43,8 @@ namespace GlobalNamespace
                                        UnityEngine.Random.Range(.2f, .9f));
         }
 
-        [Obsolete]
-        public static IEnumerator<AudioClip> GetAudioClip(string sMusicName)
-        {
-            string FilePath = Path.Combine(Application.streamingAssetsPath, "level_info", sMusicName);
-            WWW w = new WWW($"file://{FilePath}");
-            yield return w.GetAudioClip(false, false);
-        }
+
+        public static string ReadOnlyFolder { private set; get; } = Path.Combine(Application.streamingAssetsPath, "level_info");
+        public static string PersistentFolder { private set; get; } = Path.Combine(Application.persistentDataPath, "level_info");
     }
 }

@@ -165,7 +165,7 @@ public class GameManager : MonoBehaviour, IGameManager
     }
 
     [SerializeField]
-    private float fExitDelay = 5f;
+    private float fExitDelay = 2f;
     private void Update()
     {
         if (auSource.isPlaying)
@@ -173,18 +173,17 @@ public class GameManager : MonoBehaviour, IGameManager
             return;
         }
 
+        int CurPoints = int.Parse(tMaxPointsText.text);
+        if (tMaxPointsText != null && CurPoints < iCurPoints)
+        {
+            CurPoints += 5;
+            tMaxPointsText.text = Mathf.Min(CurPoints, iCurPoints).ToString();
+            return;
+        }
+
         fExitDelay -= Time.deltaTime;
         if (fExitDelay > 0f)
         {
-            if (tMaxPointsText != null)
-            {
-                int CurPoints = int.Parse(tMaxPointsText.text);
-                if (CurPoints < iCurPoints)
-                {
-                    CurPoints += 5;
-                    tMaxPointsText.text = Mathf.Min(CurPoints, iCurPoints).ToString();
-                }
-            }
             return;
         }
 

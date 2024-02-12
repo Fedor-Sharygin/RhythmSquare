@@ -64,7 +64,7 @@ namespace LevelManager
                 sCurLevelPath = StrLvlInfoPath;
             }
             
-            #if UNITY_ANDROID
+            #if UNITY_ANDROID || UNITY_WEBGL
 
             UnityWebRequest www = UnityWebRequest.Get(sCurLevelPath);
             www.SendWebRequest();

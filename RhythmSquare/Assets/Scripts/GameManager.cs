@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour, IGameManager
     private int iCurPoints = 0;
     [SerializeField]
     private TMPro.TextMeshProUGUI tMaxPointsText;
+
     [SerializeField]
     private AudioSource auGood;
     [SerializeField]
@@ -43,7 +44,6 @@ public class GameManager : MonoBehaviour, IGameManager
         srSqureSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
         RhythmTick.GrantPointsEvent += GetPoints;
         ParseInformation();
-        //StartCoroutine("ParseInformation");
         if (tPointsText != null)
         {
             tPointsText.text = iCurPoints.ToString();
@@ -75,9 +75,6 @@ public class GameManager : MonoBehaviour, IGameManager
         }
 
         aSquareAnimator.SetTrigger(iPoints < 0 ? "Bad" : "Bounce");
-        //srSqureSprite.color = new Color(Random.Range(.2f, .9f),
-        //                                Random.Range(.2f, .9f),
-        //                                Random.Range(.2f, .9f));
         srSqureSprite.color = iPoints < 0 ? Color.grey : GlobalNamespace.GlobalMethods.cCurFrameColor;
     }
 
@@ -90,6 +87,7 @@ public class GameManager : MonoBehaviour, IGameManager
     }
 
     private List<RhythmTick> lTickList = new List<RhythmTick>();
+    private int CurPoints;
     public void ParseInformation()
     {
     #if false
@@ -137,7 +135,8 @@ public class GameManager : MonoBehaviour, IGameManager
         }
         if (tMaxPointsText != null)
         {
-            tMaxPointsText.text = LevelLoader.giGameInfo.MaxPoints[iCurLevelIdx].ToString();
+            CurPoints = LevelLoader.giGameInfo.MaxPoints[iCurLevelIdx];
+            tMaxPointsText.text = CurPoints.ToString();
         }
     #endif
     }
@@ -155,6 +154,8 @@ public class GameManager : MonoBehaviour, IGameManager
                 {
                     rTick.bMove = true;
                 }
+
+                GlobalNamespace.GlobalMethods.StartLevel();
             }
         );
     }
@@ -173,11 +174,16 @@ public class GameManager : MonoBehaviour, IGameManager
             return;
         }
 
-        int CurPoints = int.Parse(tMaxPointsText.text);
+        if (!GlobalNamespace.GlobalMethods.bLevelEnded)
+        {
+            GlobalNamespace.GlobalMethods.EndLevel();
+        }
+
         if (tMaxPointsText != null && CurPoints < iCurPoints)
         {
-            CurPoints += 5;
-            tMaxPointsText.text = Mathf.Min(CurPoints, iCurPoints).ToString();
+            CurPoints = (int)Mathf.Lerp(CurPoints, iCurPoints, .03f) + 5;
+            CurPoints = Mathf.Min(CurPoints, iCurPoints);
+            tMaxPointsText.text = CurPoints.ToString();
             return;
         }
 

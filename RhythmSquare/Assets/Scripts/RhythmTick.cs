@@ -53,7 +53,7 @@ public class RhythmTick : MonoBehaviour
 
     private void OnDestroy()
     {
-        int Points = bDeduct ? -5 : 10 - 2 * Mathf.FloorToInt(Mathf.Abs(transform.position.x) / .1f);
+        int Points = bDeduct ? -5 : GlobalNamespace.GlobalMethods.GetGamePointPoints(gameObject);
         GrantPointsEvent(Points);
         if (bDeduct)
         {

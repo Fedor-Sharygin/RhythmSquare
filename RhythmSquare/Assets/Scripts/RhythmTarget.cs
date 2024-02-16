@@ -28,6 +28,11 @@ public class RhythmTarget : MonoBehaviour
 #endif
     private void Update()
     {
+        if (GlobalNamespace.GlobalMethods.bLevelEnded)
+        {
+            return;
+        }
+
         #if UNITY_ANDROID || UNITY_IOS
         
         if (Input.touchCount - PrevTouchCount > 0)
@@ -73,12 +78,23 @@ public class RhythmTarget : MonoBehaviour
 
     [SerializeField]
     private List<SpriteRenderer> lSpriteDependencies;
+    [SerializeField]
+    private TMPro.TextMeshProUGUI tParticlePointText;
+    private float fPointFontSize = 40f;
     private void PressTick()
     {
         if (lgoRhythmTicks.Count <= 1)
         {
             GameObject.FindGameObjectWithTag("GameManager")?.GetComponent<GameManager>()?.GetPoints(-10);
             return;
+        }
+
+        int CurPoints = GlobalNamespace.GlobalMethods.GetGamePointPoints(lgoRhythmTicks[0])
+                      + GlobalNamespace.GlobalMethods.GetGamePointPoints(lgoRhythmTicks[1]);
+        if (CurPoints > 0)
+        {
+            tParticlePointText.fontSize = fPointFontSize + 5f * CurPoints;
+            tParticlePointText.text = '+' + CurPoints.ToString();
         }
 
         aAnimator.SetTrigger("Bounce");
@@ -95,9 +111,6 @@ public class RhythmTarget : MonoBehaviour
         {
             srRender.color = GlobalNamespace.GlobalMethods.cCurFrameColor;
         }
-
-        //lgoRhythmTicks[0].GetComponent<RhythmTick>()?.DisableCollision();
-        //lgoRhythmTicks[1].GetComponent<RhythmTick>()?.DisableCollision();
 
         Destroy(lgoRhythmTicks[0]);
         Destroy(lgoRhythmTicks[1]);

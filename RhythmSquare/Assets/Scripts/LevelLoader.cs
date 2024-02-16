@@ -118,10 +118,12 @@ namespace LevelManager
         {
             if (sScene.name != "GameScene")
             {
+                #if !UNITY_WEBGL
                 if (bSetupComplete)
                 {
                     SaveMaxPoints();
                 }
+                #endif
                 return;
             }
 
@@ -153,12 +155,14 @@ namespace LevelManager
 
         private static void SaveMaxPoints()
         {
+            #if !UNITY_WEBGL
             LevelFileNames LevelNames = new LevelFileNames();
             LevelNames.Levels = giGameInfo.saLevelNames.ToArray();
             LevelNames.MaxPoints = giGameInfo.MaxPoints.ToArray();
 
             string JsonDesc = JsonUtility.ToJson(LevelNames, true);
             File.WriteAllText(LevelInfoPath, JsonDesc);
+            #endif
         }
     }
 }

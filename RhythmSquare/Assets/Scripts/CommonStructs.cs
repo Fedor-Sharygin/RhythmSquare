@@ -69,6 +69,25 @@ namespace LevelManager
             MaxPoints.Add(iMaxPoints);
         }
 
+        #if UNITY_WEBGL
+
+        public void ParseLevel(string sLevelFileName, string sLevelDescription)
+        {
+            if (saLevelNames.Contains(sLevelFileName))
+            {
+                return;
+            }
+
+            saLevelNames.Add(sLevelFileName);
+            
+            LevelInfo NLevelInfo = JsonUtility.FromJson<LevelInfo>(sLevelDescription);
+            Levels.Add(NLevelInfo);
+
+            MaxPoints.Add(0);
+        }
+
+        #endif
+
         public string GetLevelName(int iCurIdx)
         {
             if (iCurIdx < 0 || iCurIdx >= saLevelNames.Count)

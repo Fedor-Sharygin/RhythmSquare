@@ -93,6 +93,7 @@ public class RhythmTarget : MonoBehaviour
                       + GlobalNamespace.GlobalMethods.GetGamePointPoints(lgoRhythmTicks[1]);
         if (CurPoints > 0)
         {
+            psColorEmitter.emissionRate = CurPoints;
             tParticlePointText.fontSize = fPointFontSize + 5f * CurPoints;
             tParticlePointText.text = '+' + CurPoints.ToString();
         }

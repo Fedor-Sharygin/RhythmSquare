@@ -181,7 +181,7 @@ public class GameManager : MonoBehaviour, IGameManager
 
         if (tMaxPointsText != null && CurPoints < iCurPoints)
         {
-            CurPoints = (int)Mathf.Lerp(CurPoints, iCurPoints, .03f) + 5;
+            CurPoints = (int)Mathf.Lerp(CurPoints, iCurPoints, Mathf.Pow(2, -10)) + 5;
             CurPoints = Mathf.Min(CurPoints, iCurPoints);
             tMaxPointsText.text = CurPoints.ToString();
             return;

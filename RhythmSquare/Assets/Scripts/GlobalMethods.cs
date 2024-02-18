@@ -13,7 +13,7 @@ namespace GlobalNamespace
         {
             string FilePath = Path.Combine(ReadOnlyFolder, sMusicName);
             
-            #if UNITY_STANDALONE || UNITY_EDITOR
+            #if UNITY_STANDALONE || UNITY_EDITOR || UNITY_IOS
             
             FilePath = $"file://{FilePath}";
             
@@ -26,7 +26,7 @@ namespace GlobalNamespace
              || UWR.result == UnityWebRequest.Result.ProtocolError
              || UWR.result == UnityWebRequest.Result.DataProcessingError)
             {
-                Debug.LogError($"Error loading audio: {UWR.error}");
+                Debug.LogError($"LOG: Error loading audio file [{FilePath}]: [{UWR.error}]");
             }
             else
             {

@@ -16,6 +16,7 @@ namespace LevelManager
 
         private static void CreatePDPFile(string LevelInfo)
         {
+            Debug.Log($"Creating file [{LevelInfoPath}]");
             if (Directory.CreateDirectory(GlobalNamespace.GlobalMethods.PersistentFolder) == null)
             {
                 Debug.LogError($"{GlobalNamespace.GlobalMethods.PersistentFolder} directory failed at creation");
@@ -23,10 +24,11 @@ namespace LevelManager
             FileStream _DummyStream = File.Create(LevelInfoPath, 4096, FileOptions.WriteThrough | FileOptions.Asynchronous);
             if (_DummyStream == null)
             {
-                Debug.LogError($"File {LevelInfoPath} creation failed!");
+                Debug.LogError($"File [{LevelInfoPath}] creation fail!");
             }
             else
             {
+                Debug.Log($"File [{LevelInfoPath}] creation success!");
                 _DummyStream.Close();
             }
             File.WriteAllText(LevelInfoPath, LevelInfo);
@@ -61,21 +63,27 @@ namespace LevelManager
             bool bNoFileAvailable;
             if (bNoFileAvailable = !File.Exists(sCurLevelPath))
             {
+                Debug.Log($"LOG: File not found at [{LevelInfoPath}] - using [{StrLvlInfoPath}]");
                 sCurLevelPath = StrLvlInfoPath;
             }
             
-            #if UNITY_ANDROID
+            #if UNITY_ANDROID || UNITY_IOS
+
+            #if UNITY_IOS
+            sCurLevelPath = "file://" + sCurLevelPath;
+            #endif
 
             UnityWebRequest www = UnityWebRequest.Get(sCurLevelPath);
             www.SendWebRequest();
             while (!www.isDone);
             if (www.result == UnityWebRequest.Result.Success)
             {
+                Debug.Log($"LOG: File found at [{sCurLevelPath}]");
                 LevelInfoString = www.downloadHandler.text;
             }
             else
             {
-                Debug.LogWarning($"Error while parsing [{sCurLevelPath}] file: [{www.error}]");
+                Debug.LogWarning($"LOG: Error while parsing [{sCurLevelPath}] file: [{www.error}]");
                 LevelInfoString = File.ReadAllText(sCurLevelPath);
             }
             
@@ -84,6 +92,8 @@ namespace LevelManager
             LevelInfoString = File.ReadAllText(sCurLevelPath);
             
             #endif
+
+            Debug.Log($"LOG: Current info string: [{LevelInfoString}]");
             
             if (bNoFileAvailable)
             {
@@ -102,7 +112,7 @@ namespace LevelManager
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error during deserialization: {ex.Message}");
+                Debug.LogError($"LOG: Error during deserialization: {ex.Message}");
             }
 
             bSetupComplete = true;

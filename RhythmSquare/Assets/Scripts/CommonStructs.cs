@@ -44,6 +44,8 @@ namespace LevelManager
                 return;
             }
 
+            Debug.Log($"LOG: Creation [{sLevelFileName}] file - start");
+
             saLevelNames.Add(sLevelFileName);
 
             string DirectoryPath = Path.Combine(Application.streamingAssetsPath, "level_info");
@@ -59,14 +61,27 @@ namespace LevelManager
             UnityWebRequest www = UnityWebRequest.Get(LevelInfoPath);
             www.SendWebRequest();
             while (!www.isDone);
-            LevelInfoString = www.downloadHandler.text;
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log($"LOG: File found at [{LevelInfoPath}]");
+                LevelInfoString = www.downloadHandler.text;
+            }
+            else
+            {
+                Debug.LogWarning($"LOG: Error while parsing [{LevelInfoPath}] file: [{www.error}]");
+                LevelInfoString = File.ReadAllText(LevelInfoPath);
+            }
+            //LevelInfoString = www.downloadHandler.text;
             
             #endif
+
+            Debug.Log($"LOG: Current Level info is: [{LevelInfoString}]");
 
             LevelInfo NLevelInfo = JsonUtility.FromJson<LevelInfo>(LevelInfoString);
             Levels.Add(NLevelInfo);
 
             MaxPoints.Add(iMaxPoints);
+            Debug.Log($"LOG: Creation [{sLevelFileName}] file - end");
         }
 
         #if UNITY_WEBGL
